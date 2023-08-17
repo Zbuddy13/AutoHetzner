@@ -1,10 +1,13 @@
 from datetime import date
 import time
 import hcloud
+import os
 
 from hcloud import Client
 from hcloud.images import Image
 from hcloud.server_types import ServerType
+
+
 
 # Todays date and time string
 now = time.localtime()
@@ -12,7 +15,10 @@ current_time = time.strftime("%H:%M:%S", now)
 currentDateTime = str(date.today()) + " " + str(current_time) # Todays Date
 
 # API TOKEN
-apiToken = "eCTF9Ri4gy7GYHX4X6eDxu8wwMChMGw5daOIOthBCDWav5qIltKtEMXLuIRbFQYb"
+apiToken = os.environ.get('token', None)
+
+# Snapshot History
+noOfSnapshotsKept = os.environ.get('snapshothistory', 3)
 
 # Get the servers
 client = Client(token=apiToken)
@@ -35,7 +41,8 @@ def createAllSnapshots(serverInfo):
 #Find a way for it to wait till new images are created
 def deleteAllSnapshots(image):
     while True:
-        if (len(client.images.get_all(type="snapshot")) == 9): break
+        if (len(client.images.get_all(type="snapshot")) == len(serverNames)*noOfSnapshotsKept): break
+        elif (len(client.images.get_all(type="snapshot")) < len(serverNames)*noOfSnapshotsKept): return
     i=0
     for name in image:
         if(not name):
@@ -44,16 +51,28 @@ def deleteAllSnapshots(image):
             client.images.delete(name)
             print("Image" + str(name) + "deleted")
             i+=1
-        if(i == 3): break
+        if(i == len(serverNames)): break
 
 def createTestServer(): # enter serverNames[0] for first server
     response = client.servers.create(name = ("Test "+str(serverNames[0].name)), image=images[0], server_type=
                           client.server_types.get_by_name(serverNames[0].name))
     print(str(response))
-#def protectAllSnapshots
+    
+def protectAllSnapshots(method):
+    imagesToProtect = client.images.get_all(type="snapshot")
+    for name in imagesToProtect:
+        response = client.images.change_protection(name, delete=method)
+    if(method):
+        print("Locked images")
+    else:
+        print("Unlocked images")
+        
+
 # Call the all snapshots function
+protectAllSnapshots(False)
 createAllSnapshots(serverNames)
 deleteAllSnapshots(images)
+protectAllSnapshots(True)
 #createTestServer()
 
 #print("Test"+str(images[0]))
