@@ -14,10 +14,11 @@ COPY . .
 #Token variable
 ENV token="TOKEN"
 ENV snapshothistory="NUMBER"
+ENV sleep="SLEEP"
 
 #Run the main program
 CMD [ "python3", "snapshot.py" ]
 
 #Compile on mac
-#sudo docker build . -t zbuddy/autohetzner:
+#sudo docker build . -t zbuddy19/autohetzner:
 #docker push zbuddy19/autohetzner:tagname
