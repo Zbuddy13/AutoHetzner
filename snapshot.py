@@ -1,19 +1,14 @@
 from datetime import date
 import time
-import hcloud
 import os
-import asyncio
-import apscheduler
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 from hcloud import Client
-from hcloud.images import Image
-from hcloud.server_types import ServerType
 
 # For docker
 # API TOKEN
-apiToken = os.environ.get('token', None)
+apiToken = os.environ.get('token', "")
 # Snapshot History
 noOfSnapshotsKept = os.environ.get('snapshothistory', 4)
 # Sleep variable
@@ -38,18 +33,17 @@ def createAllSnapshots(serverInfo, currentDateTime, client):
 
 # Delete all snapshots unwanted
 def deleteAllSnapshots(image, serverNames, clientIn):
-    while True:
-        if (len(clientIn.images.get_all(type="snapshot")) == (len(serverNames)*int(noOfSnapshotsKept)+len(serverNames))): break
-        elif (len(clientIn.images.get_all(type="snapshot")) < len(serverNames)*int(noOfSnapshotsKept)): return
-    i=0
-    for name in image:
-        if(not name):
-            print("Error deleting, does not exist")
-        else:
-            clientIn.images.delete(name)
-            print("Image" + str(name) + "deleted")
-            i+=1
-        if(i == len(serverNames)): break
+    if (len(clientIn.images.get_all(type="snapshot")) < len(serverNames)*int(noOfSnapshotsKept)): return
+    if (len(clientIn.images.get_all(type="snapshot")) >= (len(serverNames)*int(noOfSnapshotsKept)+len(serverNames))):
+        i=0
+        for name in image:
+            if(not name):
+                print("Error deleting, does not exist")
+            else:
+                clientIn.images.delete(name)
+                print("Image" + str(name) + "deleted")
+                i+=1
+            if(i == len(serverNames)): break
 
 def createTestServer(serverNames, images, client): # enter serverNames[0] for first server
     response = client.servers.create(name = ("Test "+str(serverNames[0].name)), image=images[0], server_type=
@@ -81,7 +75,7 @@ def runSnapshot():
         protectAllSnapshots(False, clientvar)
         print("Unprotect Snapshot Run")
         createAllSnapshots(serverNamesList, dateTime, clientvar)
-        print("Protect Snapshot Create")
+        print("Snapshot Created")
         deleteAllSnapshots(images, serverNamesList, clientvar)
         print("Protect Snapshot Delete")
         protectAllSnapshots(True, clientvar)
@@ -89,7 +83,7 @@ def runSnapshot():
         success = 1
         
 # Test program   
-runSnapshot()
+#runSnapshot()
 # Get the servers
 #client = Client(token=apiToken)
 #serverNamesList = client.servers.get_all()
