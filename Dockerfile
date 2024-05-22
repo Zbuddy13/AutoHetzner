@@ -1,10 +1,11 @@
-FROM --platform=linux/amd64 python:3.10.11-alpine3.17 as build
+#FROM --platform=linux/amd64 python:3.10.11-alpine3.17 as build
+FROM python:3.11.2-alpine
 
 LABEL AUTHOR=ZBUDDY
 
+COPY /requirements.txt /requirements.txt
 RUN pip3 install --upgrade pip
-RUN pip3 install hcloud
-RUN pip3 install apscheduler
+RUN pip3 install -r /requirements.txt
 RUN apk update
 RUN apk upgrade
 

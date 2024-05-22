@@ -6,6 +6,8 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 
 from hcloud import Client
 
+os.environ['TZ'] = 'America/New_York'
+
 # For docker
 # API TOKEN
 apiToken = os.environ.get('token', "")
@@ -83,7 +85,7 @@ def runSnapshot():
         success = 1
         
 # Test program   
-#runSnapshot()
+runSnapshot()
 # Get the servers
 #client = Client(token=apiToken)
 #serverNamesList = client.servers.get_all()

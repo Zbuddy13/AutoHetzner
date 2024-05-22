@@ -1,0 +1,13 @@
+APScheduler==3.10.4
+certifi==2024.2.2
+charset-normalizer==3.3.2
+DateTime==5.5
+hcloud==1.35.0
+idna==3.7
+python-dateutil==2.9.0.post0
+pytz==2024.1
+requests==2.32.2
+six==1.16.0
+tzlocal==5.2
+urllib3==2.2.1
+zope.interface==6.4.post0

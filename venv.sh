@@ -6,7 +6,7 @@
 # pip freeze > requirements.txt
 
 # Remove the virtual environment
-rm -rf venvl
+rm -rf venv
 
 # List the packages installed
 pip list
