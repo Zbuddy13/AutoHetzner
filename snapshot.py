@@ -1,16 +1,27 @@
 from datetime import date
 import time
 import os
+import settings
+import subprocess
+import json
+from flask import jsonify
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 from hcloud import Client
 
+import threading
+from fastapi import FastAPI
+
+from flask import Flask, jsonify, request
+import logging
+
+
 os.environ['TZ'] = 'America/New_York'
 
 # For docker
 # API TOKEN
-apiToken = os.environ.get('token', "")
+apiToken = os.environ.get('token', "ErHvNPcU0xFR9UuxIiEJrtfhFrHx86pznrWRqYjVSoskOnFZbVOLhxS3BYYQb2Ku")
 # Snapshot History
 noOfSnapshotsKept = os.environ.get('snapshothistory', 4)
 # Sleep variable
@@ -81,11 +92,42 @@ def runSnapshot():
         deleteAllSnapshots(images, serverNamesList, clientvar)
         print("Protect Snapshot Delete")
         protectAllSnapshots(True, clientvar)
-        print("Protect Snapshot Run")
+        print("Protected all snapshots")
+        settings.snapshotStatus = "Ran at " + dateTime
         success = 1
-        
-# Test program   
-runSnapshot()
+
+###########################################################
+# Api for Hetzner
+###########################################################
+
+app = Flask(__name__)
+
+logging.getLogger('werkzeug').disabled = True
+
+@app.route('/date', methods=['GET'])
+def get_date():
+    result = subprocess.check_output(['date']).decode('utf-8')
+    return jsonify({'date': result.strip()})
+
+@app.route('/returnjson', methods = ['GET']) 
+def ReturnJSON(): 
+    var = "hello"
+    if(request.method == 'GET'): 
+        data = { 
+            "Modules" : var, 
+            "Subject" : "Data Structures and Algorithms", 
+        }
+        #print(json.dumps(data, indent=4))
+        return json.dumps(data) 
+
+# Run program one time
+#runSnapshot()
+
+#var = settings.snapshotStatus
+#data = { 
+          #  "Modules" : var, 
+         #   "Subject" : "Data Structures and Algorithms", 
+        #} 
 # Get the servers
 #client = Client(token=apiToken)
 #serverNamesList = client.servers.get_all()
@@ -93,6 +135,17 @@ runSnapshot()
 #deleteAllSnapshots(images, serverNamesList, client)
 
 # Run Job every _ hours
-scheduler = BlockingScheduler()
-scheduler.add_job(runSnapshot,'interval', hours=int(sleep))
-scheduler.start()
+#scheduler = BlockingScheduler()
+#scheduler.add_job(runSnapshot,'interval', hours=int(sleep))
+#scheduler.start()
+
+if __name__ == "__main__":
+    print("ID of process running main program: {}".format(os.getpid()))
+ 
+    print("Main thread name: {}".format(threading.current_thread().name))
+ 
+    x = threading.Thread(target=app.run(host='0.0.0.0', port=3200))
+    y = threading.Thread(target=print("It worked"))
+ 
+    x.start()
+    y.start()
