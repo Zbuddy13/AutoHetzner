@@ -106,11 +106,8 @@ def apiSend(data, url):
     else:
         print(f"Error sending data: {response.text}")
 
-subprocess.Popen(["python3", "api.py"])
-
-apiSend({"Ran at ": "hello"}, url)
 # Run program one time
-#runSnapshot()
+runSnapshot()
 
 #var = settings.snapshotStatus
 #data = { 
@@ -124,6 +121,6 @@ apiSend({"Ran at ": "hello"}, url)
 #deleteAllSnapshots(images, serverNamesList, client)
 
 # Run Job every _ hours
-#scheduler = BlockingScheduler()
-#scheduler.add_job(runSnapshot,'interval', hours=int(sleep))
-#scheduler.start()
+scheduler = BlockingScheduler()
+scheduler.add_job(runSnapshot,'interval', hours=int(sleep))
+scheduler.start()

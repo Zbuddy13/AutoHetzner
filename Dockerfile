@@ -16,6 +16,7 @@ COPY . .
 ENV token="TOKEN"
 ENV snapshothistory="NUMBER"
 ENV sleep="SLEEP"
+ENV url="URL"
 
 #Run the main program
 CMD [ "python3", "snapshot.py" ]
