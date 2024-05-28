@@ -1,20 +1,13 @@
 from datetime import date
 import time
 import os
-import settings
-import subprocess
 import json
-from flask import jsonify
-
-from apscheduler.schedulers.blocking import BlockingScheduler
+import requests
+import subprocess
 
 from hcloud import Client
 
-import threading
-from fastapi import FastAPI
-
-from flask import Flask, jsonify, request
-import logging
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 
 os.environ['TZ'] = 'America/New_York'
@@ -26,6 +19,11 @@ apiToken = os.environ.get('token', "ErHvNPcU0xFR9UuxIiEJrtfhFrHx86pznrWRqYjVSosk
 noOfSnapshotsKept = os.environ.get('snapshothistory', 4)
 # Sleep variable
 sleep = os.environ.get('sleep', 8)
+
+#API Variables
+jsondata = ""
+url = os.environ.get('url', "http://127.0.0.1:2500/recieve")
+
 
 # Todays date and time string
 def getTime():
@@ -93,33 +91,24 @@ def runSnapshot():
         print("Protect Snapshot Delete")
         protectAllSnapshots(True, clientvar)
         print("Protected all snapshots")
-        settings.snapshotStatus = "Ran at " + dateTime
+        apiSend({"Ran at ": dateTime}, url)
         success = 1
 
 ###########################################################
-# Api for Hetzner
+# Api for Discord
 ###########################################################
 
-app = Flask(__name__)
+def apiSend(data, url):
+    json_data = json.dumps(data)
+    response = requests.post(url, data=json_data, headers={"Content-Type": "application/json"})
+    if response.status_code == 200:
+        print("Data sent successfully!")
+    else:
+        print(f"Error sending data: {response.text}")
 
-logging.getLogger('werkzeug').disabled = True
+subprocess.Popen(["python3", "api.py"])
 
-@app.route('/date', methods=['GET'])
-def get_date():
-    result = subprocess.check_output(['date']).decode('utf-8')
-    return jsonify({'date': result.strip()})
-
-@app.route('/returnjson', methods = ['GET']) 
-def ReturnJSON(): 
-    var = "hello"
-    if(request.method == 'GET'): 
-        data = { 
-            "Modules" : var, 
-            "Subject" : "Data Structures and Algorithms", 
-        }
-        #print(json.dumps(data, indent=4))
-        return json.dumps(data) 
-
+apiSend({"Ran at ": "hello"}, url)
 # Run program one time
 #runSnapshot()
 
@@ -138,14 +127,3 @@ def ReturnJSON():
 #scheduler = BlockingScheduler()
 #scheduler.add_job(runSnapshot,'interval', hours=int(sleep))
 #scheduler.start()
-
-if __name__ == "__main__":
-    print("ID of process running main program: {}".format(os.getpid()))
- 
-    print("Main thread name: {}".format(threading.current_thread().name))
- 
-    x = threading.Thread(target=app.run(host='0.0.0.0', port=3200))
-    y = threading.Thread(target=print("It worked"))
- 
-    x.start()
-    y.start()

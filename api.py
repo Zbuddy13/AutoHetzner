@@ -1,31 +1,30 @@
-from flask import Flask, jsonify, request
-import subprocess
-import settings
-import logging
-import json
+from quart import  Quart, jsonify
+from quart import request
+import os
 
-app = Flask(__name__)
+port = os.environ.get('port', 2500)
 
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
-app.logger.disabled = True
-log.disabled = True
+app = Quart(__name__)
 
-@app.route('/date', methods=['GET'])
-def get_date():
-    result = subprocess.check_output(['date']).decode('utf-8')
-    return jsonify({'date': result.strip()})
+data = {"nothing" : "sent"}
 
-@app.route('/returnjson', methods = ['GET']) 
-def ReturnJSON(): 
-    var = "hello"
-    if(request.method == 'GET'): 
-        data = { 
-            "Modules" : var, 
-            "Subject" : "Data Structures and Algorithms", 
-        }
-        #print(json.dumps(data, indent=4))
-        return json.dumps(data) 
+@app.post("/recieve")
+async def recieve():
+    global data
+    try:
+        data = await request.get_json()  # Attempt to parse JSON
+        if data is None:
+            return jsonify({"error": "Invalid JSON data"}), 400  # Handle missing or invalid JSON
+        print(f"Received data: {data}")  # Print received data with formatting
+        # Process or store the data here (replace with your logic)
+        return jsonify({"message": "Data received successfully!"})
+    except Exception as e:  # Catch generic exceptions for robustness
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3200)
+@app.get("/send")
+async def send():
+    global data
+    return data
+
+def run() -> None:
+    app.run(port=port)
