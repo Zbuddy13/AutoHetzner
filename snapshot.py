@@ -115,8 +115,8 @@ def apiSend(data, url):
         print(f"Failure - Unknown error occurred: {e}.")
 
 # Run program one time
-#runSnapshot()
-apiSend({"Ran at ": "test"}, url)
+runSnapshot()
+#apiSend({"Ran at ": "test"}, url)
 
 #var = settings.snapshotStatus
 #data = { 
