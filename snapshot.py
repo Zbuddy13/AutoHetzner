@@ -3,18 +3,16 @@ import time
 import os
 import json
 import requests
-import subprocess
 
 from hcloud import Client
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-
 os.environ['TZ'] = 'America/New_York'
 
 # For docker
 # API TOKEN
-apiToken = os.environ.get('token', "ErHvNPcU0xFR9UuxIiEJrtfhFrHx86pznrWRqYjVSoskOnFZbVOLhxS3BYYQb2Ku")
+apiToken = os.environ.get('token', "")
 # Snapshot History
 noOfSnapshotsKept = os.environ.get('snapshothistory', 4)
 # Sleep variable
@@ -22,7 +20,7 @@ sleep = os.environ.get('sleep', 8)
 
 #API Variables
 jsondata = ""
-url = os.environ.get('url', "http://127.0.0.1:2500/recieve")
+url = os.environ.get('url', "http://0.0.0.0:2500/recieve")
 
 
 # Todays date and time string
@@ -99,15 +97,26 @@ def runSnapshot():
 ###########################################################
 
 def apiSend(data, url):
-    json_data = json.dumps(data)
-    response = requests.post(url, data=json_data, headers={"Content-Type": "application/json"})
-    if response.status_code == 200:
-        print("Data sent successfully!")
-    else:
-        print(f"Error sending data: {response.text}")
+    try:
+        response = requests.options(url)
+        if response.ok:
+            print("Success - API is accessible.")
+            json_data = json.dumps(data)
+            response = requests.post(url, data=json_data, headers={"Content-Type": "application/json"})
+            if response.status_code == 200:
+                print("Data sent successfully!")
+            else:
+                print(f"Error sending data: {response.text}")
+        else:
+            print(f"Failure - API is accessible but something is not right. Response code : {response.status_code}")
+    except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError) as e:
+        print(f"Failure - Unable to establish connection: {e}.")
+    except Exception as e:
+        print(f"Failure - Unknown error occurred: {e}.")
 
 # Run program one time
-runSnapshot()
+#runSnapshot()
+apiSend({"Ran at ": "test"}, url)
 
 #var = settings.snapshotStatus
 #data = { 
