@@ -20,8 +20,8 @@ sleep = os.environ.get('sleep', 8)
 
 #API Variables
 jsondata = ""
-#url = os.environ.get('url', "http://0.0.0.0:2500/recieve")
-url = "http://0.0.0.0:2500/recieve"
+url = os.environ.get('url', "http://0.0.0.0:2500/recieve")
+#url = "http://0.0.0.0:2500/recieve"
 
 # Todays date and time string
 def getTime():
