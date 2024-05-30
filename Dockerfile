@@ -19,7 +19,7 @@ ENV sleep="SLEEP"
 ENV url="URL"
 
 #Run the main program
-CMD [ "python3", "snapshot.py" ]
+CMD [ "python3", "-u", "snapshot.py" ]
 
 #Compile on mac
 #sudo docker build . -t zbuddy19/autohetzner:
