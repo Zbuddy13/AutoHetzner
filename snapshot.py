@@ -20,8 +20,8 @@ sleep = os.environ.get('sleep', 8)
 
 #API Variables
 jsondata = ""
-url = os.environ.get('url', "http://0.0.0.0:2500/recieve")
-
+#url = os.environ.get('url', "http://0.0.0.0:2500/recieve")
+url = "http://0.0.0.0:2500/recieve"
 
 # Todays date and time string
 def getTime():
@@ -115,8 +115,8 @@ def apiSend(data, url):
         print(f"Failure - Unknown error occurred: {e}.")
 
 # Run program one time
-runSnapshot()
-#apiSend({"Ran at ": "test"}, url)
+#runSnapshot()
+apiSend({"Ran at ": getTime()}, url)
 
 #var = settings.snapshotStatus
 #data = { 
