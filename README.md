@@ -1,4 +1,5 @@
 Example Compose:
+```
 services:
     autohetzner:
         container_name: hetznerSnapshot
@@ -10,3 +11,4 @@ services:
             - /mnt/drive/appdata/hetznerSnapshot:/data
         restart: unless-stopped
         image: zbuddy19/autohetzner:latest
+```
